@@ -358,10 +358,11 @@
       clearInterval(timerInterval);
       document.getElementById('tracking-timer').remove();
       webgazer.pause();
-      document.getElementById('status-display').classList.remove('hidden');
       updateStatus('Saving files...', 'status-info');
       generateExcelFile();
       generateHeatmap();
+      document.querySelector('.container').style.display = 'block';
+      document.getElementById('status-display').classList.remove('hidden');
       updateStatus('Tracking successfully done', 'status-success');
     }
 
