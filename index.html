@@ -180,7 +180,7 @@
     </div>
 
     <div id="status-display" class="hidden">
-      <div id="status-message" class="status-info">Initializing WebGazer...</div>
+      <div id="status-message" class="status-info">Preparing Calibration...</div>
       <div id="download-group" class="input-group hidden">
         <button class="btn" onclick="downloadResults()">Download Results</button>
       </div>
@@ -214,7 +214,7 @@
 
       try {
         await loadBackground(imageUrl, imageFile);
-        updateStatus('Initializing WebGazer...', 'status-info');
+        updateStatus('Preparing Calibration...', 'status-info');
         await initializeWebGazer();
         updateStatus('Starting calibration...', 'status-info');
         await startCalibration();
@@ -299,7 +299,7 @@
         overlay.innerHTML = `
           <h2>Calibration</h2>
           <p>Click on each red dot to calibrate.</p>
-          <p>Calibration starting now...</p>`;
+          <p>Preparing to start eye tracking...</p>`;
         document.body.appendChild(overlay);
 
         setTimeout(() => {
