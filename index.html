@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Eye Tracking with WebGazer</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+    #uploadedImage {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    #gazeCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+    #controls, #calibration, #instructions {
+      position: absolute;
+      top: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 8px;
+      z-index: 10;
+    }
+    #controls {
+      left: 10px;
+    }
+    #instructions {
+      right: 10px;
+      max-width: 300px;
+    }
+    #calibration {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: auto;
+    }
+    .calibration-point {
+      width: 30px;
+      height: 30px;
+      background-color: red;
+      border-radius: 50%;
+      margin: 50px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <label>Image URL: <input type="text" id="imageUrl"></label><br>
+    <label>or Upload File: <input type="file" id="imageFile" accept="image/*"></label><br>
+    <label>Tracking Duration (seconds): <input type="number" id="durationInput" min="1" value="10"></label><br>
+    <button onclick="startSetup()">Start</button>
+  </div>
+  <div id="instructions">Step-by-step instructions will appear here.</div>
+  <div id="container">
+    <img id="uploadedImage" style="display:none;" />
+    <canvas id="gazeCanvas"></canvas>
+  </div>
+  <div id="calibration"></div>
+
+  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/xlsx.mini.min.js"></script>
+  <script>
+    let image = document.getElementById('uploadedImage');
+    let canvas = document.getElementById('gazeCanvas');
+    let ctx = canvas.getContext('2d');
+    let calibrationDiv = document.getElementById('calibration');
+    let instructions = document.getElementById('instructions');
+    let gazeData = [];
+    let trackingDuration = 10;
+
+    function startSetup() {
+      const url = document.getElementById('imageUrl').value;
+      const file = document.getElementById('imageFile').files[0];
+      trackingDuration = parseInt(document.getElementById('durationInput').value);
+
+      if (url) {
+        image.src = url;
+        image.onload = () => showImage();
+      } else if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          image.src = e.target.result;
+          image.onload = () => showImage();
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert("Please provide an image URL or upload a file.");
+      }
+    }
+
+    function showImage() {
+      image.style.display = 'block';
+      canvas.width = image.clientWidth;
+      canvas.height = image.clientHeight;
+      canvas.style.width = image.clientWidth + 'px';
+      canvas.style.height = image.clientHeight + 'px';
+      canvas.style.top = image.offsetTop + 'px';
+      canvas.style.left = image.offsetLeft + 'px';
+      setupCalibration();
+    }
+
+    function setupCalibration() {
+      instructions.innerText = 'Click each red dot to calibrate your gaze.';
+      calibrationDiv.innerHTML = '';
+      calibrationDiv.style.display = 'flex';
+
+      const positions = [
+        ["10%", "10%"], ["50%", "10%"], ["90%", "10%"],
+        ["10%", "50%"], ["50%", "50%"], ["90%", "50%"],
+        ["10%", "90%"], ["50%", "90%"], ["90%", "90%"]
+      ];
+
+      let clicksRemaining = 9;
+
+      positions.forEach(pos => {
+        const dot = document.createElement('div');
+        dot.className = 'calibration-point';
+        dot.style.position = 'absolute';
+        dot.style.left = pos[0];
+        dot.style.top = pos[1];
+        dot.onclick = () => {
+          dot.style.backgroundColor = 'gray';
+          dot.style.pointerEvents = 'none';
+          clicksRemaining--;
+          if (clicksRemaining === 0) {
+            calibrationDiv.style.display = 'none';
+            startTracking();
+          }
+        };
+        calibrationDiv.appendChild(dot);
+      });
+    }
+
+    function startTracking() {
+      instructions.innerText = 'Tracking your gaze...';
+      gazeData = [];
+      webgazer.setGazeListener((data, timestamp) => {
+        if (data) {
+          const x = data.x;
+          const y = data.y;
+          gazeData.push({ timestamp, x, y });
+          drawGazePoint(x, y);
+        }
+      }).begin();
+
+      setTimeout(() => {
+        stopTracking();
+      }, trackingDuration * 1000);
+    }
+
+    function drawGazePoint(x, y) {
+      ctx.fillStyle = 'red';
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function stopTracking() {
+      instructions.innerText = 'Tracking complete. Saving files...';
+      webgazer.end();
+      saveExcel();
+      saveImage();
+    }
+
+    function saveExcel() {
+      const ws = XLSX.utils.json_to_sheet(gazeData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "GazeData");
+      XLSX.writeFile(wb, "gaze_data.xlsx");
+    }
+
+    function saveImage() {
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = canvas.height;
+      const tempCtx = tempCanvas.getContext('2d');
+
+      tempCtx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      tempCtx.drawImage(canvas, 0, 0);
+      const imgData = tempCanvas.toDataURL("image/png");
+
+      const a = document.createElement('a');
+      a.href = imgData;
+      a.download = 'gaze_heatmap.png';
+      a.click();
+    }
+  </script>
+</body>
+</html>
