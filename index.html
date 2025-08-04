@@ -291,7 +291,8 @@
       startTime = Date.now();
       gazeData = [];
 
-      // Hide status after 3 seconds
+      // Hide UI container and status message
+      document.querySelector('.container').style.display = 'none';
       setTimeout(() => {
         document.getElementById('status-display').classList.add('hidden');
       }, 3000);
@@ -355,8 +356,7 @@
       const ctx = canvas.getContext('2d');
 
       if (currentImage) {
-        const img = currentImage;
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
       } else {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
