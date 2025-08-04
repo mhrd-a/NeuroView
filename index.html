@@ -8,88 +8,62 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     body {
+      font-family: sans-serif;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #e0eafc, #cfdef3);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      background: #f5f5f5;
     }
-
     .container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
       background: white;
-      padding: 40px 30px;
-      border-radius: 16px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-      max-width: 500px;
-      width: 90%;
-      box-sizing: border-box;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-
-    .container h1 {
-      text-align: center;
-      font-size: 1.8em;
-      margin-bottom: 30px;
-      color: #333;
-    }
-
     .input-group {
       margin-bottom: 20px;
     }
-
     .input-group label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 5px;
       font-weight: bold;
-      color: #444;
     }
-
-    .input-group input {
+    input[type="text"],
+    input[type="number"],
+    input[type="file"],
+    input[type="url"] {
       width: 100%;
-      padding: 10px 14px;
+      padding: 10px;
+      border-radius: 4px;
       border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1em;
       box-sizing: border-box;
-      transition: border-color 0.2s;
     }
-
-    .input-group input:focus {
-      outline: none;
-      border-color: #007bff;
+    input:focus {
+      outline: 2px solid #007bff;
+      border: 1px solid #007bff;
     }
-
+    small {
+      display: block;
+      margin-top: 4px;
+      color: #666;
+      font-size: 0.85em;
+    }
     .btn {
-      width: 100%;
+      padding: 12px 20px;
       background: #007bff;
       color: white;
-      padding: 12px 0;
       border: none;
-      border-radius: 8px;
-      font-size: 1em;
-      font-weight: bold;
       cursor: pointer;
-      transition: background 0.2s;
+      border-radius: 4px;
+      font-size: 1rem;
     }
-
     .btn:hover {
       background: #0056b3;
     }
-
-    #status-display {
-      margin-top: 20px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.1em;
-    }
-
     .hidden {
       display: none;
     }
-
-    /* Minimal necessary for other parts to work */
     .fullscreen-bg, .background-frame {
       position: fixed;
       top: 0; left: 0;
@@ -99,7 +73,15 @@
       object-fit: contain;
       border: none;
     }
-
+    .status-info {
+      color: #007bff;
+    }
+    .status-success {
+      color: #28a745;
+    }
+    .status-warning {
+      color: #dc3545;
+    }
     .fullscreen-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -113,7 +95,6 @@
       text-align: center;
       padding: 20px;
     }
-
     .calibration-point {
       position: fixed;
       width: 30px;
@@ -123,7 +104,6 @@
       z-index: 1100;
       cursor: pointer;
     }
-
     .gaze-dot {
       position: fixed;
       width: 8px;
@@ -133,7 +113,6 @@
       pointer-events: none;
       z-index: 1500;
     }
-
     .timer {
       position: fixed;
       top: 10px;
@@ -145,18 +124,6 @@
       font-size: 1.2rem;
       z-index: 2000;
     }
-
-    .status-info {
-      color: #007bff;
-    }
-
-    .status-success {
-      color: #28a745;
-    }
-
-    .status-warning {
-      color: #dc3545;
-    }
   </style>
 </head>
 <body>
@@ -164,27 +131,34 @@
     <h1>Eye Tracking Analysis</h1>
 
     <div id="setup-phase">
+      <h2>Setup Your Test</h2>
+
       <div class="input-group">
-        <label for="testerName">Test Taker Name:</label>
-        <input type="text" id="testerName" placeholder="Enter your name" />
+        <label for="testerName">👤 Test Taker Name:</label>
+        <input type="text" id="testerName" placeholder="Enter your full name" autocomplete="name" required autofocus />
       </div>
 
       <div class="input-group">
-        <label for="imageUrl">Image or Website URL (optional):</label>
-        <input type="text" id="imageUrl" placeholder="https://example.com" />
+        <label for="imageUrl">🌐 Image or Website URL (optional):</label>
+        <input type="url" id="imageUrl" placeholder="https://example.com" pattern="https?://.+" title="Must be a valid URL" />
+        <small>Use a direct image link or a webpage address.</small>
       </div>
 
       <div class="input-group">
-        <label for="imageFile">Or Upload Image:</label>
-        <input type="file" id="imageFile" accept="image/*" />
+        <label for="imageFile">🖼️ Or Upload an Image File:</label>
+        <input type="file" id="imageFile" accept="image/*" title="Upload a local image file" />
+        <small>JPEG, PNG, GIF supported.</small>
       </div>
 
       <div class="input-group">
-        <label for="durationInput">Tracking Duration (seconds):</label>
-        <input type="number" id="durationInput" value="30" min="5" max="300" />
+        <label for="durationInput">⏱️ Tracking Duration (seconds):</label>
+        <input type="number" id="durationInput" value="30" min="5" max="300" step="5" title="Choose between 5 and 300 seconds" />
+        <small>Recommended: 30–60 seconds</small>
       </div>
 
-      <button class="btn" onclick="startEyeTracking()">Start Eye Tracking</button>
+      <div class="input-group">
+        <button class="btn" onclick="startEyeTracking()">🚀 Start Eye Tracking</button>
+      </div>
     </div>
 
     <div id="status-display" class="hidden">
@@ -192,10 +166,251 @@
     </div>
   </div>
 
-  <!-- JavaScript functions below -->
+  <!-- JS scripts are exactly the same as your original version -->
   <script>
-    // (same script logic as your previous working version)
-    // Make sure you include all the tracking, calibration, and data export logic here
+    let gazeData = [],
+        trackingActive = false,
+        currentImage = null,
+        currentIframe = null,
+        trackingDuration = 30,
+        startTime = null,
+        timerInterval = null,
+        testTakerName = '';
+
+    async function startEyeTracking() {
+      testTakerName = document.getElementById('testerName').value.trim() || 'unknown';
+      const imageUrl = document.getElementById('imageUrl').value;
+      const imageFile = document.getElementById('imageFile').files[0];
+      trackingDuration = parseInt(document.getElementById('durationInput').value);
+
+      if (!imageUrl && !imageFile) {
+        alert('Please provide a URL or upload an image file.');
+        return;
+      }
+
+      document.getElementById('setup-phase').classList.add('hidden');
+      document.getElementById('status-display').classList.remove('hidden');
+      updateStatus('Loading background...', 'status-info');
+
+      try {
+        await loadBackground(imageUrl, imageFile);
+        updateStatus('Initializing WebGazer...', 'status-info');
+        await initializeWebGazer();
+        updateStatus('Starting calibration...', 'status-info');
+        await startCalibration();
+        updateStatus('Tracking in progress...', 'status-success');
+        beginTracking();
+      } catch (error) {
+        console.error('Error:', error);
+        updateStatus('Error: ' + error.message, 'status-warning');
+      }
+    }
+
+    function loadBackground(url, file) {
+      return new Promise((resolve, reject) => {
+        if (currentImage) currentImage.remove();
+        if (currentIframe) currentIframe.remove();
+
+        if (file) {
+          const img = new Image();
+          img.className = 'fullscreen-bg';
+          img.onload = () => {
+            currentImage = img;
+            document.body.appendChild(img);
+            resolve();
+          };
+          img.onerror = () => reject(new Error('Failed to load image'));
+          const reader = new FileReader();
+          reader.onload = (e) => img.src = e.target.result;
+          reader.readAsDataURL(file);
+        } else if (url) {
+          const imageExtensions = /\.(jpg|jpeg|png|gif|bmp|webp)$/i;
+          if (imageExtensions.test(url)) {
+            const img = new Image();
+            img.className = 'fullscreen-bg';
+            img.onload = () => {
+              currentImage = img;
+              document.body.appendChild(img);
+              resolve();
+            };
+            img.onerror = () => reject(new Error('Failed to load image'));
+            img.crossOrigin = 'anonymous';
+            img.src = url;
+          } else {
+            const iframe = document.createElement('iframe');
+            iframe.className = 'background-frame';
+            iframe.src = url;
+            document.body.appendChild(iframe);
+            iframe.onload = () => {
+              currentIframe = iframe;
+              resolve();
+            };
+            iframe.onerror = () => reject(new Error('Failed to load webpage'));
+          }
+        }
+      });
+    }
+
+    function initializeWebGazer() {
+      return new Promise((resolve, reject) => {
+        webgazer
+          .setGazeListener((data, timestamp) => {
+            if (trackingActive && data) {
+              recordGazeData(data.x, data.y, timestamp);
+              drawGazeDot(data.x, data.y);
+            }
+          })
+          .begin()
+          .then(() => webgazer.showVideoPreview(false).showPredictionPoints(false) && resolve())
+          .catch(reject);
+      });
+    }
+
+    function startCalibration() {
+      return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'fullscreen-overlay';
+        if (currentImage) {
+          overlay.style.backgroundImage = `url(${currentImage.src})`;
+          overlay.style.backgroundSize = 'contain';
+          overlay.style.backgroundRepeat = 'no-repeat';
+          overlay.style.backgroundPosition = 'center center';
+        }
+        overlay.innerHTML = `
+          <h2>Calibration</h2>
+          <p>Click on each red dot to calibrate.</p>
+          <p>Calibration starting now...</p>`;
+        document.body.appendChild(overlay);
+
+        setTimeout(() => {
+          performCalibration(overlay, resolve);
+        }, 1000);
+      });
+    }
+
+    function performCalibration(overlay, resolve) {
+      const points = [
+        ['10%', '10%'], ['50%', '10%'], ['90%', '10%'],
+        ['10%', '50%'], ['50%', '50%'], ['90%', '50%'],
+        ['10%', '90%'], ['50%', '90%'], ['90%', '90%']
+      ];
+      let i = 0;
+      function next() {
+        if (i >= points.length) {
+          overlay.remove();
+          return resolve();
+        }
+        const point = document.createElement('div');
+        point.className = 'calibration-point';
+        point.style.left = points[i][0];
+        point.style.top = points[i][1];
+        point.style.transform = 'translate(-50%, -50%)';
+        point.onclick = () => {
+          point.remove();
+          i++;
+          setTimeout(next, 500);
+        };
+        document.body.appendChild(point);
+      }
+      next();
+    }
+
+    function beginTracking() {
+      trackingActive = true;
+      startTime = Date.now();
+      gazeData = [];
+
+      document.querySelector('.container').style.display = 'none';
+      setTimeout(() => {
+        document.getElementById('status-display').classList.add('hidden');
+      }, 3000);
+
+      const timer = document.createElement('div');
+      timer.className = 'timer';
+      timer.id = 'tracking-timer';
+      document.body.appendChild(timer);
+
+      let remaining = trackingDuration;
+      timer.textContent = `${remaining}s`;
+      timerInterval = setInterval(() => {
+        remaining--;
+        timer.textContent = `${remaining}s`;
+        if (remaining <= 0) stopTracking();
+      }, 1000);
+    }
+
+    function stopTracking() {
+      trackingActive = false;
+      clearInterval(timerInterval);
+      document.getElementById('tracking-timer').remove();
+      webgazer.pause();
+      updateStatus('Saving files...', 'status-info');
+      generateExcelFile();
+      generateHeatmap();
+      updateStatus('Tracking complete!', 'status-success');
+    }
+
+    function recordGazeData(x, y, timestamp) {
+      gazeData.push({ timestamp, x: Math.round(x), y: Math.round(y), relative: Date.now() - startTime });
+    }
+
+    function drawGazeDot(x, y) {
+      const dot = document.createElement('div');
+      dot.className = 'gaze-dot';
+      dot.style.left = `${x - 4}px`;
+      dot.style.top = `${y - 4}px`;
+      document.body.appendChild(dot);
+      setTimeout(() => dot.remove(), 200);
+    }
+
+    function generateExcelFile() {
+      const data = gazeData.map((g, i) => ({
+        Index: i + 1,
+        Timestamp: g.timestamp,
+        X: g.x,
+        Y: g.y,
+        'Relative Time (ms)': g.relative
+      }));
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Gaze Data');
+      XLSX.writeFile(wb, `gaze_data_${testTakerName}.xlsx`);
+    }
+
+    function generateHeatmap() {
+      const canvas = document.createElement('canvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const ctx = canvas.getContext('2d');
+
+      if (currentImage) {
+        ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      ctx.globalAlpha = 0.3;
+      ctx.fillStyle = 'red';
+      gazeData.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 30, 0, 2 * Math.PI);
+        ctx.fill();
+      });
+
+      canvas.toBlob(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `heatmap_${testTakerName}.png`;
+        a.click();
+      });
+    }
+
+    function updateStatus(msg, className) {
+      const status = document.getElementById('status-message');
+      status.textContent = msg;
+      status.className = className;
+    }
   </script>
 </body>
 </html>
