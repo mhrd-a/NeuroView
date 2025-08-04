@@ -14,9 +14,18 @@
       padding: 0;
       background: #f5f5f5;
     }
+    .header {
+      text-align: center;
+      margin: 40px 0;
+    }
+    .header img {
+      max-width: 200px;
+      height: auto;
+      margin-bottom: 10px;
+    }
     .container {
       max-width: 600px;
-      margin: 40px auto;
+      margin: 0 auto 40px auto;
       padding: 20px;
       background: white;
       border-radius: 10px;
@@ -132,7 +141,7 @@
     <img src="logo.png" alt="Logo" />
     <h1>Eye Tracking Analysis</h1>
   </div>
-  
+
   <div class="container">
     <div id="setup-phase">
       <h2>Setup Your Test</h2>
@@ -170,7 +179,6 @@
     </div>
   </div>
 
-  <!-- JS scripts are exactly the same as your original version -->
   <script>
     let gazeData = [],
         trackingActive = false,
