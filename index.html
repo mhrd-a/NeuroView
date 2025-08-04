@@ -178,6 +178,9 @@
 
     <div id="status-display" class="hidden">
       <div id="status-message" class="status-info">Initializing WebGazer...</div>
+      <div id="download-group" class="input-group hidden">
+        <button class="btn" onclick="downloadResults()">Download Results</button>
+      </div>
     </div>
   </div>
 
@@ -358,12 +361,15 @@
       clearInterval(timerInterval);
       document.getElementById('tracking-timer').remove();
       webgazer.pause();
-      updateStatus('Saving files...', 'status-info');
-      generateExcelFile();
-      generateHeatmap();
       document.querySelector('.container').style.display = 'block';
       document.getElementById('status-display').classList.remove('hidden');
+      document.getElementById('download-group').classList.remove('hidden');
       updateStatus('Tracking successfully done', 'status-success');
+    }
+
+    function downloadResults() {
+      generateExcelFile();
+      generateHeatmap();
     }
 
     function recordGazeData(x, y, timestamp) {
