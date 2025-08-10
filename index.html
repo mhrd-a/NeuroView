@@ -140,6 +140,20 @@
     #status-display {
       text-align: center;
     }
+    .instructions {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .instructions img {
+      max-width: 100%;
+      height: auto;
+      margin: 20px 0;
+    }
   </style>
 </head>
 <body>
@@ -403,7 +417,22 @@
       </div>
 
       <div class="input-group">
-        <button class="btn" onclick="startEyeTracking()">Start Eye Tracking</button>
+        <button class="btn" onclick="showInstructions()">Start Eye Tracking</button>
+      </div>
+    </div>
+
+    <div id="instructions-phase" class="instructions hidden">
+      <h2>How Eye Tracking Works</h2>
+      <p>This tool uses your webcam to track your eye movements. Follow these steps to ensure accurate tracking:</p>
+      <ul style="text-align: left; margin: 20px auto; max-width: 500px;">
+        <li>Ensure your face is well-lit and centered in the webcam frame.</li>
+        <li>Click on each red dot during calibration to help the system learn your eye movements.</li>
+        <li>Once calibration is complete, look at the image or webpage as you normally would.</li>
+        <li>The system will record your gaze points and generate a heatmap and data file when complete.</li>
+      </ul>
+      <img src="Instruction.jpg" alt="Eye Tracking Instructions" />
+      <div class="input-group">
+        <button class="btn" onclick="startEyeTracking()">Start Calibration</button>
       </div>
     </div>
 
@@ -429,6 +458,11 @@
         testTakerEducation = '',
         testTakerNationality = '';
 
+    function showInstructions() {
+      document.getElementById('setup-phase').classList.add('hidden');
+      document.getElementById('instructions-phase').classList.remove('hidden');
+    }
+
     async function startEyeTracking() {
       testTakerName = document.getElementById('testerName').value.trim() || 'unknown';
       testTakerAge = document.getElementById('testerAge').value || 'unknown';
@@ -444,7 +478,7 @@
         return;
       }
 
-      document.getElementById('setup-phase').classList.add('hidden');
+      document.getElementById('instructions-phase').classList.add('hidden');
       document.getElementById('status-display').classList.remove('hidden');
       updateStatus('Loading background...', 'status-info');
 
