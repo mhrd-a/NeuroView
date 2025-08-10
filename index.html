@@ -436,10 +436,42 @@
       </div>
     </div>
 
+    <div id="new-test-phase" class="instructions hidden">
+      <h2>New Eye Tracking Test</h2>
+      <p>Enter a new image or website URL to start another test.</p>
+      <div class="input-group">
+        <label for="newImageUrl">🌐 Image or Website URL (optional):</label>
+        <input type="url" id="newImageUrl" placeholder="https://example.com" pattern="https?://.+" title="Must be a valid URL" />
+        <small>Use a direct image link or a webpage address.</small>
+      </div>
+      <div class="input-group">
+        <label for="newImageFile">🖼️ Or Upload an Image File:</label>
+        <input type="file" id="newImageFile" accept="image/*" title="Upload a local image file" />
+        <small>JPEG, PNG, GIF supported.</small>
+      </div>
+      <div class="input-group">
+        <label for="newDurationInput">⏱️ Tracking Duration (seconds):</label>
+        <input type="number" id="newDurationInput" value="30" min="5" max="300" step="5" title="Choose between 5 and 300 seconds" />
+        <small>Recommended: 30–60 seconds</small>
+      </div>
+      <div class="input-group">
+        <button class="btn" onclick="startNewTest()">Start New Test</button>
+      </div>
+    </div>
+
     <div id="status-display" class="hidden">
       <div id="status-message" class="status-info">Preparing Calibration...</div>
       <div id="download-group" class="input-group hidden">
         <button class="btn" onclick="downloadResults()">Download Results</button>
+      </div>
+      <div id="thank-you" class="input-group hidden">
+        <p>Thank you for completing the eye tracking test!</p>
+        <div class="input-group">
+          <button class="btn" onclick="goToHome()">Go to Home Page</button>
+        </div>
+        <div class="input-group">
+          <button class="btn" onclick="showNewTest()">Do Another Test</button>
+        </div>
       </div>
     </div>
   </div>
@@ -461,6 +493,31 @@
     function showInstructions() {
       document.getElementById('setup-phase').classList.add('hidden');
       document.getElementById('instructions-phase').classList.remove('hidden');
+    }
+
+    function showNewTest() {
+      document.getElementById('status-display').classList.add('hidden');
+      document.getElementById('thank-you').classList.add('hidden');
+      document.getElementById('download-group').classList.add('hidden');
+      document.getElementById('new-test-phase').classList.remove('hidden');
+    }
+
+    function goToHome() {
+      document.getElementById('status-display').classList.add('hidden');
+      document.getElementById('thank-you').classList.add('hidden');
+      document.getElementById('download-group').classList.add('hidden');
+      document.getElementById('setup-phase').classList.remove('hidden');
+      document.getElementById('testerName').value = '';
+      document.getElementById('testerAge').value = '';
+      document.getElementById('testerGender').value = '';
+      document.getElementById('testerEducation').value = '';
+      document.getElementById('testerNationality').value = '';
+      document.getElementById('imageUrl').value = '';
+      document.getElementById('imageFile').value = '';
+      document.getElementById('durationInput').value = '30';
+      if (currentImage) currentImage.remove();
+      if (currentIframe) currentIframe.remove();
+      webgazer.end();
     }
 
     async function startEyeTracking() {
@@ -488,6 +545,30 @@
         await initializeWebGazer();
         updateStatus('Starting calibration...', 'status-info');
         await startCalibration();
+        updateStatus('Tracking in progress...', 'status-success');
+        beginTracking();
+      } catch (error) {
+        console.error('Error:', error);
+        updateStatus('Error: ' + error.message, 'status-warning');
+      }
+    }
+
+    async function startNewTest() {
+      const imageUrl = document.getElementById('newImageUrl').value;
+      const imageFile = document.getElementById('newImageFile').files[0];
+      trackingDuration = parseInt(document.getElementById('newDurationInput').value);
+
+      if (!imageUrl && !imageFile) {
+        alert('Please provide a URL or upload an image file.');
+        return;
+      }
+
+      document.getElementById('new-test-phase').classList.add('hidden');
+      document.getElementById('status-display').classList.remove('hidden');
+      updateStatus('Loading background...', 'status-info');
+
+      try {
+        await loadBackground(imageUrl, imageFile);
         updateStatus('Tracking in progress...', 'status-success');
         beginTracking();
       } catch (error) {
@@ -637,6 +718,7 @@
       document.querySelector('.container').style.display = 'block';
       document.getElementById('status-display').classList.remove('hidden');
       document.getElementById('download-group').classList.remove('hidden');
+      document.getElementById('thank-you').classList.remove('hidden');
       updateStatus('Tracking successfully done', 'status-success');
     }
 
