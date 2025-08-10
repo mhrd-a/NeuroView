@@ -488,7 +488,8 @@
         testTakerAge = '',
         testTakerGender = '',
         testTakerEducation = '',
-        testTakerNationality = '';
+        testTakerNationality = '',
+        isWebGazerInitialized = false;
 
     function showInstructions() {
       document.getElementById('setup-phase').classList.add('hidden');
@@ -518,6 +519,7 @@
       if (currentImage) currentImage.remove();
       if (currentIframe) currentIframe.remove();
       webgazer.end();
+      isWebGazerInitialized = false;
     }
 
     async function startEyeTracking() {
@@ -541,8 +543,13 @@
 
       try {
         await loadBackground(imageUrl, imageFile);
-        updateStatus('Preparing Calibration...', 'status-info');
-        await initializeWebGazer();
+        updateStatus('Preparing WebGazer...', 'status-info');
+        if (!isWebGazerInitialized) {
+          await initializeWebGazer();
+          isWebGazerInitialized = true;
+        } else {
+          webgazer.resume();
+        }
         updateStatus('Starting calibration...', 'status-info');
         await startCalibration();
         updateStatus('Tracking in progress...', 'status-success');
@@ -569,6 +576,13 @@
 
       try {
         await loadBackground(imageUrl, imageFile);
+        updateStatus('Preparing WebGazer...', 'status-info');
+        if (!isWebGazerInitialized) {
+          await initializeWebGazer();
+          isWebGazerInitialized = true;
+        } else {
+          webgazer.resume();
+        }
         updateStatus('Tracking in progress...', 'status-success');
         beginTracking();
       } catch (error) {
