@@ -642,7 +642,9 @@
 
     function downloadResults() {
       generateExcelFile();
-      generateHeatmap();
+      generateHeatmap('simple');
+      generateHeatmap('timing');
+      generateHeatmap('density');
     }
 
     function recordGazeData(x, y, timestamp) {
@@ -687,7 +689,7 @@
       XLSX.writeFile(wb, `gaze_data_${testTakerName}.xlsx`);
     }
 
-    function generateHeatmap() {
+    function generateHeatmap(type) {
       const canvas = document.createElement('canvas');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -700,18 +702,84 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
-      ctx.globalAlpha = 0.3;
-      ctx.fillStyle = 'red';
-      gazeData.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 30, 0, 2 * Math.PI);
-        ctx.fill();
-      });
+      let filename;
+      switch (type) {
+        case 'simple':
+          ctx.globalAlpha = 0.3;
+          ctx.fillStyle = 'red';
+          gazeData.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 30, 0, 2 * Math.PI);
+            ctx.fill();
+          });
+          filename = `heatmap_simple_${testTakerName}.png`;
+          break;
+        case 'timing':
+          ctx.globalAlpha = 0.3;
+          gazeData.forEach((p, i) => {
+            let progress = i / (gazeData.length - 1);
+            let r, g, b = 0;
+            if (progress <= 0.5) {
+              r = Math.round(255 * (progress / 0.5));
+              g = 255;
+            } else {
+              r = 255;
+              g = Math.round(255 * (1 - (progress - 0.5) / 0.5));
+            }
+            ctx.fillStyle = `rgb(${r},${g},${b})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 30, 0, 2 * Math.PI);
+            ctx.fill();
+          });
+          filename = `heatmap_timing_${testTakerName}.png`;
+          break;
+        case 'density':
+          const dcanvas = document.createElement('canvas');
+          dcanvas.width = canvas.width;
+          dcanvas.height = canvas.height;
+          const dctx = dcanvas.getContext('2d');
+          dctx.fillStyle = 'black';
+          dctx.globalAlpha = 0.02;
+          gazeData.forEach(p => {
+            dctx.beginPath();
+            dctx.arc(p.x, p.y, 50, 0, 2 * Math.PI);
+            dctx.fill();
+          });
+          let imageData = dctx.getImageData(0, 0, canvas.width, canvas.height);
+          let data = imageData.data;
+          let max_alpha = 0;
+          for (let i = 3; i < data.length; i += 4) {
+            if (data[i] > max_alpha) max_alpha = data[i];
+          }
+          if (max_alpha === 0) max_alpha = 1;
+          for (let i = 0; i < data.length; i += 4) {
+            let alpha = data[i + 3];
+            if (alpha > 0) {
+              let norm = alpha / max_alpha;
+              let r, g, b = 0;
+              if (norm <= 0.5) {
+                r = Math.round(255 * (norm / 0.5));
+                g = 255;
+              } else {
+                r = 255;
+                g = Math.round(255 * (1 - (norm - 0.5) / 0.5));
+              }
+              data[i] = r;
+              data[i + 1] = g;
+              data[i + 2] = b;
+              data[i + 3] = Math.round(128 + 127 * norm);
+            }
+          }
+          dctx.putImageData(imageData, 0, 0);
+          ctx.drawImage(dcanvas, 0, 0);
+          filename = `heatmap_density_${testTakerName}.png`;
+          break;
+      }
 
       canvas.toBlob(blob => {
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `heatmap_${testTakerName}.png`;
+        a.download = filename;
         a.click();
       });
     }
