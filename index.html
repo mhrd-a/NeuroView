@@ -484,9 +484,7 @@
         testTakerGender = '',
         testTakerEducation = '',
         testTakerNationality = '',
-        isWebGazerInitialized = false,
-        imageWidth = 0,
-        imageHeight = 0;
+        isWebGazerInitialized = false;
 
     function showInstructions() {
       document.getElementById('setup-phase').classList.add('hidden');
@@ -598,8 +596,6 @@
           img.className = 'fullscreen-bg';
           img.onload = () => {
             currentImage = img;
-            imageWidth = img.naturalWidth;
-            imageHeight = img.naturalHeight;
             document.body.appendChild(img);
             resolve();
           };
@@ -614,8 +610,6 @@
             img.className = 'fullscreen-bg';
             img.onload = () => {
               currentImage = img;
-              imageWidth = img.naturalWidth;
-              imageHeight = img.naturalHeight;
               document.body.appendChild(img);
               resolve();
             };
@@ -629,8 +623,6 @@
             document.body.appendChild(iframe);
             iframe.onload = () => {
               currentIframe = iframe;
-              imageWidth = window.innerWidth;
-              imageHeight = window.innerHeight;
               resolve();
             };
             iframe.onerror = () => reject(new Error('Failed to load webpage'));
@@ -644,8 +636,7 @@
         webgazer
           .setGazeListener((data, timestamp) => {
             if (trackingActive && data) {
-              const normalized = normalizeCoordinates(data.x, data.y);
-              recordGazeData(normalized.x, normalized.y, timestamp);
+              recordGazeData(data.x, data.y, timestamp);
               drawGazeDot(data.x, data.y);
             }
           })
@@ -653,15 +644,6 @@
           .then(() => webgazer.showVideoPreview(false).showPredictionPoints(false) && resolve())
           .catch(reject);
       });
-    }
-
-    function normalizeCoordinates(x, y) {
-      // Transform viewport coordinates to normalized (0,0) at bottom-left, (100,100) at top-right
-      const scaleX = 100 / imageWidth;
-      const scaleY = 100 / imageHeight;
-      const normalizedX = x * scaleX;
-      const normalizedY = 100 - (y * scaleY); // Invert y-axis to place (0,0) at bottom-left
-      return { x: Math.round(normalizedX), y: Math.round(normalizedY) };
     }
 
     function startCalibration() {
@@ -688,9 +670,9 @@
 
     function performCalibration(overlay, resolve) {
       const points = [
-        ['10%', '90%'], ['50%', '90%'], ['90%', '90%'], // Adjusted for bottom-left origin
+        ['10%', '10%'], ['50%', '10%'], ['90%', '10%'],
         ['10%', '50%'], ['50%', '50%'], ['90%', '50%'],
-        ['10%', '10%'], ['50%', '10%'], ['90%', '10%']
+        ['10%', '90%'], ['50%', '90%'], ['90%', '90%']
       ];
       let i = 0;
       function next() {
@@ -759,8 +741,8 @@
     function recordGazeData(x, y, timestamp) {
       gazeData.push({ 
         timestamp, 
-        x, // Store normalized coordinates
-        y, 
+        x: Math.round(x), 
+        y: Math.round(y), 
         relative: Date.now() - startTime,
         name: testTakerName,
         age: testTakerAge,
@@ -771,7 +753,6 @@
     }
 
     function drawGazeDot(x, y) {
-      // Draw gaze dot in viewport coordinates for visual feedback
       const dot = document.createElement('div');
       dot.className = 'gaze-dot';
       dot.style.left = `${x - 4}px`;
@@ -780,17 +761,36 @@
       setTimeout(() => dot.remove(), 200);
     }
 
+    function generateExcelFile() {
+      const data = gazeData.map((g, i) => ({
+        Index: i + 1,
+        Name: g.name,
+        Age: g.age,
+        Gender: g.gender,
+        Education: g.education,
+        Nationality: g.nationality,
+        Timestamp: g.timestamp,
+        X: g.x,
+        Y: g.y,
+        'Relative Time (ms)': g.relative
+      }));
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Gaze Data');
+      XLSX.writeFile(wb, `gaze_data_${testTakerName}.xlsx`);
+    }
+
     function generateHeatmap(type) {
       const canvas = document.createElement('canvas');
-      canvas.width = 100; // Normalized coordinate system
-      canvas.height = 100;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
       const ctx = canvas.getContext('2d');
 
       if (currentImage) {
-        ctx.drawImage(currentImage, 0, 0, 100, 100);
+        ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
       } else {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-        ctx.fillRect(0, 0, 100, 100);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
       let filename;
@@ -800,7 +800,7 @@
           ctx.fillStyle = 'red';
           gazeData.forEach(p => {
             ctx.beginPath();
-            ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI); // Adjusted radius for normalized scale
+            ctx.arc(p.x, p.y, 30, 0, 2 * Math.PI);
             ctx.fill();
           });
           filename = `heatmap_simple_${testTakerName}.png`;
@@ -819,24 +819,24 @@
             }
             ctx.fillStyle = `rgb(${r},${g},${b})`;
             ctx.beginPath();
-            ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
+            ctx.arc(p.x, p.y, 30, 0, 2 * Math.PI);
             ctx.fill();
           });
           filename = `heatmap_timing_${testTakerName}.png`;
           break;
         case 'density':
           const dcanvas = document.createElement('canvas');
-          dcanvas.width = 100;
-          dcanvas.height = 100;
+          dcanvas.width = canvas.width;
+          dcanvas.height = canvas.height;
           const dctx = dcanvas.getContext('2d');
           dctx.fillStyle = 'black';
           dctx.globalAlpha = 0.02;
           gazeData.forEach(p => {
             dctx.beginPath();
-            dctx.arc(p.x, p.y, 5, 0, 2 * Math.PI); // Adjusted radius
+            dctx.arc(p.x, p.y, 50, 0, 2 * Math.PI);
             dctx.fill();
           });
-          let imageData = dctx.getImageData(0, 0, 100, 100);
+          let imageData = dctx.getImageData(0, 0, canvas.width, canvas.height);
           let data = imageData.data;
           let max_alpha = 0;
           for (let i = 3; i < data.length; i += 4) {
@@ -873,25 +873,6 @@
         a.download = filename;
         a.click();
       });
-    }
-
-    function generateExcelFile() {
-      const data = gazeData.map((g, i) => ({
-        Index: i + 1,
-        Name: g.name,
-        Age: g.age,
-        Gender: g.gender,
-        Education: g.education,
-        Nationality: g.nationality,
-        Timestamp: g.timestamp,
-        X: g.x,
-        Y: g.y,
-        'Relative Time (ms)': g.relative
-      }));
-      const ws = XLSX.utils.json_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Gaze Data');
-      XLSX.writeFile(wb, `gaze_data_${testTakerName}.xlsx`);
     }
 
     function updateStatus(msg, className) {
