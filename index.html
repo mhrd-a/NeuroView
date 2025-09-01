@@ -10,7 +10,7 @@
   <style>
     body {
       font-family: sans-serif;
-      margin: 20px;
+      margin: 20;
       padding: 0;
       background: #6A0DAD;
     }
@@ -70,9 +70,16 @@
       cursor: pointer;
       border-radius: 4px;
       font-size: 1rem;
+      flex-grow: 1; /* Allows buttons to share space */
+    }
+    .btn-secondary {
+        background: #6c757d;
     }
     .btn:hover {
       background: #0056b3;
+    }
+    .btn-secondary:hover {
+        background: #5a6268;
     }
     .hidden {
       display: none;
@@ -154,43 +161,55 @@
       height: auto;
       margin: 20px 0;
     }
-    .consent-overlay {
+    .button-group {
+        display: flex;
+        gap: 10px; /* Creates space between buttons */
+        justify-content: center;
+    }
+    /* Consent Modal Styles */
+    #consent-modal {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 2000;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 9999;
       display: flex;
-      justify-content: center;
       align-items: center;
-      flex-direction: column;
-      color: white;
-      text-align: left;
+      justify-content: center;
       padding: 20px;
     }
     .consent-content {
-      max-width: 600px;
       background: white;
-      color: black;
-      padding: 20px;
-      border-radius: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      max-height: 80vh;
+      color: #333;
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 650px;
+      max-height: 90vh;
       overflow-y: auto;
+      text-align: left;
     }
     .consent-content h2 {
       margin-top: 0;
     }
-    .consent-content p {
-      margin: 10px 0;
+    .consent-content h3 {
+        margin-top: 1em;
     }
     .consent-content ul {
-      margin: 10px 0;
-      padding-left: 20px;
+        padding-left: 20px;
+    }
+    .consent-content li {
+        margin-bottom: 10px;
+    }
+    .consent-content button {
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px;
+      font-size: 1.1rem;
     }
   </style>
 </head>
 <body>
-  <div id="consent-overlay" class="consent-overlay">
+  <div id="consent-modal">
     <div class="consent-content">
       <h2>Research Study Consent</h2>
       <p>You are invited to participate in a research study that examines how people view crowdfunding websites. The study uses a web-based eye-tracking tool with your laptop webcam to record where you look on the screen. The goal is to better understand how website design influences user attention.</p>
@@ -205,17 +224,17 @@
       <p>This study involves minimal risk. You may experience mild eye fatigue from looking at the screen. No video recordings or images from your webcam will be stored.</p>
       <p>Your responses will be anonymous. If you choose to enter your name, it will only be used temporarily to track data quality and will not be linked to your gaze data.</p>
       <p>Participation is completely voluntary. You may stop at any time by closing your browser window.</p>
-      <p>By clicking the button below, you confirm that you are at least 18 years old, have read this information, and voluntarily agree to participate in this study.</p>
-      <div class="input-group">
-        <button id="consent-button" class="btn">I Agree to Participate</button>
-      </div>
+      <p><strong>By clicking the button below, you confirm that you are at least 18 years old, have read this information, and voluntarily agree to participate in this study.</strong></p>
+      <button id="agree-button" class="btn">I Agree to Participate</button>
     </div>
   </div>
-  <div class="container hidden" id="main-container">
+
+  <div class="container hidden">
     <div class="header">
       <img src="logo.png" alt="Logo" />
       <h1>Eye Tracking Analysis</h1>
     </div>
+    
     <div id="setup-phase">
       <h2>Setup Your Test</h2>
       <div class="input-group">
@@ -464,11 +483,12 @@
       </div>
     </div>
     <div id="instructions-phase" class="instructions hidden">
-      <h2 style="line-height: 1.2; margin: 0 0 4px 0;">How Eye Tracking Works</h2>
-      <p style="line-height: 1.2; margin: 0;">This tool uses your webcam to track your eye movements.</p>
-      <p style="line-height: 1.2; margin: 0;">Follow these steps to ensure accurate tracking:</p>
+    <h2 style="line-height: 1.2; margin: 0 0 4px 0;">How Eye Tracking Works</h2>
+    <p style="line-height: 1.2; margin: 0;">This tool uses your webcam to track your eye movements.</p>
+    <p style="line-height: 1.2; margin: 0;">Follow these steps to ensure accurate tracking:</p>
       <img src="Instruction.jpg" alt="Eye Tracking Instructions" />
-      <div class="input-group">
+      <div class="button-group">
+        <button class="btn btn-secondary" onclick="goBackToSetup()">Back</button>
         <button class="btn" onclick="startEyeTracking()">Start Calibration</button>
       </div>
     </div>
@@ -501,16 +521,25 @@
       </div>
       <div id="thank-you" class="input-group hidden">
         <p>Thank you for completing the eye tracking test!</p>
-        <div class="input-group">
+        <div class="button-group">
           <button class="btn" onclick="goToHome()">Go to Home Page</button>
-        </div>
-        <div class="input-group">
           <button class="btn" onclick="showNewTest()">Do Another Test</button>
         </div>
       </div>
     </div>
   </div>
   <script>
+    window.onload = function() {
+        const consentModal = document.getElementById('consent-modal');
+        const agreeButton = document.getElementById('agree-button');
+        const mainContainer = document.querySelector('.container');
+
+        agreeButton.onclick = function() {
+            consentModal.style.display = 'none';
+            mainContainer.classList.remove('hidden');
+        };
+    };
+
     let gazeData = [],
         trackingActive = false,
         currentImage = null,
@@ -525,35 +554,14 @@
         testTakerNationality = '',
         isWebGazerInitialized = false;
 
-    function acceptConsent() {
-      console.log('acceptConsent called');
-      const consentOverlay = document.getElementById('consent-overlay');
-      const mainContainer = document.getElementById('main-container');
-      if (consentOverlay && mainContainer) {
-        consentOverlay.classList.add('hidden');
-        mainContainer.classList.remove('hidden');
-        console.log('Consent overlay hidden, main container shown');
-      } else {
-        console.error('Could not find consent-overlay or main-container elements');
-      }
-    }
-
-    // Add event listener for the consent button as a fallback
-    document.addEventListener('DOMContentLoaded', () => {
-      const consentButton = document.getElementById('consent-button');
-      if (consentButton) {
-        consentButton.addEventListener('click', () => {
-          console.log('Consent button clicked');
-          acceptConsent();
-        });
-      } else {
-        console.error('Consent button not found');
-      }
-    });
-
     function showInstructions() {
       document.getElementById('setup-phase').classList.add('hidden');
       document.getElementById('instructions-phase').classList.remove('hidden');
+    }
+    
+    function goBackToSetup() {
+        document.getElementById('instructions-phase').classList.add('hidden');
+        document.getElementById('setup-phase').classList.remove('hidden');
     }
 
     function showNewTest() {
