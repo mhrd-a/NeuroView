@@ -10,7 +10,7 @@
   <style>
     body {
       font-family: sans-serif;
-      margin: 20;
+      margin: 20px;
       padding: 0;
       background: #6A0DAD;
     }
@@ -154,29 +154,78 @@
       height: auto;
       margin: 20px 0;
     }
+    .consent-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 2000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      text-align: left;
+      padding: 20px;
+    }
+    .consent-content {
+      max-width: 600px;
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .consent-content h2 {
+      margin-top: 0;
+    }
+    .consent-content p {
+      margin: 10px 0;
+    }
+    .consent-content ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
   </style>
 </head>
 <body>
-
-  <div class="container">
+  <div id="consent-overlay" class="consent-overlay">
+    <div class="consent-content">
+      <h2>Research Study Consent</h2>
+      <p>You are invited to participate in a research study that examines how people view crowdfunding websites. The study uses a web-based eye-tracking tool with your laptop webcam to record where you look on the screen. The goal is to better understand how website design influences user attention.</p>
+      <h3>Procedures:</h3>
+      <p>If you agree to participate, you will:</p>
+      <ul>
+        <li>Provide basic demographic information (age, gender, nationality, education; your name is optional).</li>
+        <li>Complete a short device check and a 9-point calibration.</li>
+        <li>View four different crowdfunding website designs, each for about 30 seconds.</li>
+        <li>The entire study will take about 5 minutes.</li>
+      </ul>
+      <p>This study involves minimal risk. You may experience mild eye fatigue from looking at the screen. No video recordings or images from your webcam will be stored.</p>
+      <p>Your responses will be anonymous. If you choose to enter your name, it will only be used temporarily to track data quality and will not be linked to your gaze data.</p>
+      <p>Participation is completely voluntary. You may stop at any time by closing your browser window.</p>
+      <p>By clicking the button below, you confirm that you are at least 18 years old, have read this information, and voluntarily agree to participate in this study.</p>
+      <div class="input-group">
+        <button id="consent-button" class="btn">I Agree to Participate</button>
+      </div>
+    </div>
+  </div>
+  <div class="container hidden" id="main-container">
     <div class="header">
       <img src="logo.png" alt="Logo" />
       <h1>Eye Tracking Analysis</h1>
     </div>
-    
     <div id="setup-phase">
       <h2>Setup Your Test</h2>
-
       <div class="input-group">
         <label for="testerName">👤 Test Taker Name:</label>
         <input type="text" id="testerName" placeholder="Enter your full name" autocomplete="name" required autofocus />
       </div>
-
       <div class="input-group">
         <label for="testerAge">🎂 Age:</label>
         <input type="number" id="testerAge" placeholder="Enter your age" min="1" max="120" required />
       </div>
-
       <div class="input-group">
         <label for="testerGender">🚻 Gender:</label>
         <select id="testerGender" required>
@@ -185,7 +234,6 @@
           <option value="female">Female</option>
         </select>
       </div>
-
       <div class="input-group">
         <label for="testerEducation">🎓 Education Level:</label>
         <select id="testerEducation" required>
@@ -196,7 +244,6 @@
           <option value="more">Post-Graduate or Higher</option>
         </select>
       </div>
-
       <div class="input-group">
         <label for="testerNationality">🌍 Nationality:</label>
         <select id="testerNationality" required>
@@ -397,40 +444,34 @@
           <option value="zimbabwean">Zimbabwean</option>
         </select>
       </div>
-
       <div class="input-group">
         <label for="imageUrl">🌐 Image or Website URL (optional):</label>
         <input type="url" id="imageUrl" placeholder="https://example.com" pattern="https?://.+" title="Must be a valid URL" />
         <small>Use a direct image link or a webpage address.</small>
       </div>
-
       <div class="input-group">
         <label for="imageFile">🖼️ Or Upload an Image File:</label>
         <input type="file" id="imageFile" accept="image/*" title="Upload a local image file" />
         <small>JPEG, PNG, GIF supported.</small>
       </div>
-
       <div class="input-group">
         <label for="durationInput">⏱️ Tracking Duration (seconds):</label>
         <input type="number" id="durationInput" value="30" min="5" max="300" step="5" title="Choose between 5 and 300 seconds" />
         <small>Recommended: 30–60 seconds</small>
       </div>
-
       <div class="input-group">
         <button class="btn" onclick="showInstructions()">Start Eye Tracking</button>
       </div>
     </div>
-
     <div id="instructions-phase" class="instructions hidden">
-    <h2 style="line-height: 1.2; margin: 0 0 4px 0;">How Eye Tracking Works</h2>
-    <p style="line-height: 1.2; margin: 0;">This tool uses your webcam to track your eye movements.</p>
-    <p style="line-height: 1.2; margin: 0;">Follow these steps to ensure accurate tracking:</p>
+      <h2 style="line-height: 1.2; margin: 0 0 4px 0;">How Eye Tracking Works</h2>
+      <p style="line-height: 1.2; margin: 0;">This tool uses your webcam to track your eye movements.</p>
+      <p style="line-height: 1.2; margin: 0;">Follow these steps to ensure accurate tracking:</p>
       <img src="Instruction.jpg" alt="Eye Tracking Instructions" />
       <div class="input-group">
         <button class="btn" onclick="startEyeTracking()">Start Calibration</button>
       </div>
     </div>
-
     <div id="new-test-phase" class="instructions hidden">
       <h2>New Eye Tracking Test</h2>
       <p>Enter a new image or website URL to start another test.</p>
@@ -453,7 +494,6 @@
         <button class="btn" onclick="startNewTest()">Start New Test</button>
       </div>
     </div>
-
     <div id="status-display" class="hidden">
       <div id="status-message" class="status-info">Preparing Calibration...</div>
       <div id="download-group" class="input-group hidden">
@@ -470,7 +510,6 @@
       </div>
     </div>
   </div>
-
   <script>
     let gazeData = [],
         trackingActive = false,
@@ -485,6 +524,32 @@
         testTakerEducation = '',
         testTakerNationality = '',
         isWebGazerInitialized = false;
+
+    function acceptConsent() {
+      console.log('acceptConsent called');
+      const consentOverlay = document.getElementById('consent-overlay');
+      const mainContainer = document.getElementById('main-container');
+      if (consentOverlay && mainContainer) {
+        consentOverlay.classList.add('hidden');
+        mainContainer.classList.remove('hidden');
+        console.log('Consent overlay hidden, main container shown');
+      } else {
+        console.error('Could not find consent-overlay or main-container elements');
+      }
+    }
+
+    // Add event listener for the consent button as a fallback
+    document.addEventListener('DOMContentLoaded', () => {
+      const consentButton = document.getElementById('consent-button');
+      if (consentButton) {
+        consentButton.addEventListener('click', () => {
+          console.log('Consent button clicked');
+          acceptConsent();
+        });
+      } else {
+        console.error('Consent button not found');
+      }
+    });
 
     function showInstructions() {
       document.getElementById('setup-phase').classList.add('hidden');
@@ -526,16 +591,13 @@
       const imageUrl = document.getElementById('imageUrl').value;
       const imageFile = document.getElementById('imageFile').files[0];
       trackingDuration = parseInt(document.getElementById('durationInput').value);
-
       if (!imageUrl && !imageFile) {
         alert('Please provide a URL or upload an image file.');
         return;
       }
-
       document.getElementById('instructions-phase').classList.add('hidden');
       document.getElementById('status-display').classList.remove('hidden');
       updateStatus('Loading background...', 'status-info');
-
       try {
         await loadBackground(imageUrl, imageFile);
         updateStatus('Preparing WebGazer...', 'status-info');
@@ -559,16 +621,13 @@
       const imageUrl = document.getElementById('newImageUrl').value;
       const imageFile = document.getElementById('newImageFile').files[0];
       trackingDuration = parseInt(document.getElementById('newDurationInput').value);
-
       if (!imageUrl && !imageFile) {
         alert('Please provide a URL or upload an image file.');
         return;
       }
-
       document.getElementById('new-test-phase').classList.add('hidden');
       document.getElementById('status-display').classList.remove('hidden');
       updateStatus('Loading background...', 'status-info');
-
       try {
         await loadBackground(imageUrl, imageFile);
         updateStatus('Preparing WebGazer...', 'status-info');
@@ -590,7 +649,6 @@
       return new Promise((resolve, reject) => {
         if (currentImage) currentImage.remove();
         if (currentIframe) currentIframe.remove();
-
         if (file) {
           const img = new Image();
           img.className = 'fullscreen-bg';
@@ -661,7 +719,6 @@
           <p>Click on each red dot to calibrate.</p>
           <p>Preparing to start eye tracking...</p>`;
         document.body.appendChild(overlay);
-
         setTimeout(() => {
           performCalibration(overlay, resolve);
         }, 1000);
@@ -699,17 +756,14 @@
       trackingActive = true;
       startTime = Date.now();
       gazeData = [];
-
       document.querySelector('.container').style.display = 'none';
       setTimeout(() => {
         document.getElementById('status-display').classList.add('hidden');
       }, 3000);
-
       const timer = document.createElement('div');
       timer.className = 'timer';
       timer.id = 'tracking-timer';
       document.body.appendChild(timer);
-
       let remaining = trackingDuration;
       timer.textContent = `${remaining}s`;
       timerInterval = setInterval(() => {
@@ -739,10 +793,10 @@
     }
 
     function recordGazeData(x, y, timestamp) {
-      gazeData.push({ 
-        timestamp, 
-        x: Math.round(x), 
-        y: Math.round(y), 
+      gazeData.push({
+        timestamp,
+        x: Math.round(x),
+        y: Math.round(y),
         relative: Date.now() - startTime,
         name: testTakerName,
         age: testTakerAge,
@@ -785,14 +839,12 @@
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       const ctx = canvas.getContext('2d');
-
       if (currentImage) {
         ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
       } else {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
-
       let filename;
       switch (type) {
         case 'simple':
@@ -866,7 +918,6 @@
           filename = `heatmap_density_${testTakerName}.png`;
           break;
       }
-
       canvas.toBlob(blob => {
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
