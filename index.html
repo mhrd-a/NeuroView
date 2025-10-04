@@ -70,7 +70,7 @@
       cursor: pointer;
       border-radius: 4px;
       font-size: 1rem;
-      flex-grow: 1; /* Allows buttons to share space */
+      flex-grow: 1;
     }
     .btn-secondary {
         background: #6c757d;
@@ -163,7 +163,7 @@
     }
     .button-group {
         display: flex;
-        gap: 10px; /* Creates space between buttons */
+        gap: 10px;
         justify-content: center;
     }
     /* Consent Modal Styles */
@@ -211,30 +211,48 @@
 <body>
   <div id="consent-modal">
     <div class="consent-content">
-      <h2>Research Study Consent</h2>
-      <p>You are invited to participate in a research study that examines how people view crowdfunding websites. The study uses a web-based eye-tracking tool with your laptop webcam to record where you look on the screen. The goal is to better understand how website design influences user attention.</p>
-      <h3>Procedures:</h3>
-      <p>If you agree to participate, you will:</p>
+      <h2>Informed Consent Document</h2>
+      <h3>Old Dominion University</h3>
+      <p><strong>Project Title:</strong> Visual Attention to Signals in Crowdfunding Decisions</p>
+      <h3>Introduction</h3>
+      <p>The purposes of this form are to provide information that may affect your decision to participate in this research and to record the consent of those who agree to participate. This study, <em>Visual Attention to Crowdfunding Signals: An Eye-Tracking Experiment</em>, is conducted in room 2019 (Hudgins Transitional Entrepreneurship Lab) in Strome College of Business.</p>
+      <h3>Researchers</h3>
       <ul>
-        <li>Provide basic demographic information (age, gender, nationality, education; your name is optional).</li>
-        <li>Complete a short device check and a 9-point calibration.</li>
-        <li>View four different crowdfunding website designs, each for about 30 seconds.</li>
-        <li>The entire study will take about 5 minutes.</li>
+        <li>John B. Ford, Professor of Marketing, Old Dominion University, USA</li>
+        <li>Mehrdad Alikhani, Ph.D. Student in Business Administration, Strategic Management, Old Dominion University, USA</li>
+        <li>Farinoosh Zarinmakan, Ph.D. Student in Business Administration, Marketing, Old Dominion University, USA</li>
       </ul>
-      <p>This study involves minimal risk. You may experience mild eye fatigue from looking at the screen. No video recordings or images from your webcam will be stored.</p>
-      <p>Your responses will be anonymous. If you choose to enter your name, it will only be used temporarily to track data quality and will not be linked to your gaze data.</p>
-      <p>Participation is completely voluntary. You may stop at any time by closing your browser window.</p>
-      <p><strong>By clicking the button below, you confirm that you are at least 18 years old, have read this information, and voluntarily agree to participate in this study.</strong></p>
+      <h3>Description of Research Study</h3>
+      <p>Several studies have explored factors influencing backers' funding decisions in crowdfunding environments. However, none have used eye-tracking to examine the neurocognitive processes through which these factors work, specifically how creator and crowd signals capture visual attention to shape cognitive processing and influence investment intentions.</p>
+      <p>If you decide to participate, you will join a study examining how people make decisions when viewing crowdfunding websites. The study uses your computer's webcam to estimate your gaze position as you view four simulated crowdfunding webpages, one after another. Your task is to view each webpage while the eye-tracking application records which parts of the page you look at. Participation will last 5–10 minutes in room 2019 (Hudgins Transitional Entrepreneurship Lab) in Strome College of Business. Approximately 50 other adult participants will be involved in this study.</p>
+      <h3>Inclusionary/Exclusionary Criteria</h3>
+      <p>You should have completed a pre-screening questionnaire confirming you are over 21, have normal or corrected-to-normal vision, and are comfortable using a computer with a functioning webcam. You should not have uncorrected visual impairments or medical conditions affecting concentration or eye movements that would prevent participation.</p>
+      <h3>Risks and Benefits</h3>
+      <p><strong>Risks:</strong> You may experience minimal discomfort, such as eye strain from viewing the screen or boredom from the repetitive task. Some may feel uncomfortable with eye movement tracking via webcam. The researchers have minimized these risks by keeping the study short (5–10 minutes), anonymizing all data, and using the webcam only to estimate gaze position, not to record your face. There is also a possibility of unidentified risks.</p>
+      <p><strong>Benefits:</strong> There are no direct benefits to participants. The study’s results may expand entrepreneurs’ knowledge of crowdfunding campaign design.</p>
+      <h3>Costs and Payments</h3>
+      <p>Participation is voluntary, with no payment for your time or to cover incidental expenses (e.g., parking, travel).</p>
+      <h3>New Information</h3>
+      <p>If new information arises that could affect your decision to participate, the researchers will provide it to you.</p>
+      <h3>Confidentiality</h3>
+      <p>The researchers will take reasonable steps to keep your demographic answers and eye-tracking data confidential. All identifiable information will be removed, and data will be anonymized. The webcam will only estimate gaze position, not record your face. Results may be used in reports, presentations, or publications, but you will not be identified. Your records may be subpoenaed or inspected by authorized bodies.</p>
+      <h3>Withdrawal Privilege</h3>
+      <p>You may decline to participate or withdraw at any time without affecting your relationship with Old Dominion University or losing any entitled benefits. The researchers may also withdraw your participation if they observe issues with your continued involvement.</p>
+      <h3>Compensation for Illness and Injury</h3>
+      <p>Your consent does not waive your legal rights. However, Old Dominion University and the researchers cannot provide compensation, insurance, or medical care for harm, injury, or illness arising from this study. If you suffer an injury, you may contact the researchers: Mehrdad Alikhani at 757-735-8504, Farinoosh Zarinmakan at 757-309-1332, Dr. John B. Ford at 757-683-3587, Dr. Tancy Vandecar-Burdin (IRB Chair) at 757-683-3802, or the Old Dominion University Division of Research and Economic Development at 757-683-3460.</p>
+      <h3>Voluntary Consent</h3>
+      <p>By agreeing to participate, you confirm that you have read this form, understand the study, its risks, and benefits, and have had your questions answered. If you have further questions or feel pressured, contact Dr. Tancy Vandecar-Burdin at 757-683-3802 or the Old Dominion University Division of Research and Economic Development at 757-683-3460.</p>
+      <p><a href="https://github.com/mhrd-a/NeuroView/blob/main/Consent%20Form-Online.pdf" target="_blank">Download Consent Form (PDF)</a></p>
+      <p><strong>By clicking the button below, you confirm that you are at least 21 years old, have read this information, and voluntarily agree to participate in this study.</strong></p>
       <button id="agree-button" class="btn">I Agree to Participate</button>
     </div>
   </div>
-
   <div class="container hidden">
     <div class="header">
       <img src="logo.png" alt="Logo" />
       <h1>Eye Tracking Analysis</h1>
     </div>
-    
+   
     <div id="setup-phase">
       <h2>Setup Your Test</h2>
       <div class="input-group">
@@ -533,13 +551,11 @@
         const consentModal = document.getElementById('consent-modal');
         const agreeButton = document.getElementById('agree-button');
         const mainContainer = document.querySelector('.container');
-
         agreeButton.onclick = function() {
             consentModal.style.display = 'none';
             mainContainer.classList.remove('hidden');
         };
     };
-
     let gazeData = [],
         trackingActive = false,
         currentImage = null,
@@ -553,24 +569,21 @@
         testTakerEducation = '',
         testTakerNationality = '',
         isWebGazerInitialized = false;
-
     function showInstructions() {
       document.getElementById('setup-phase').classList.add('hidden');
       document.getElementById('instructions-phase').classList.remove('hidden');
     }
-    
+   
     function goBackToSetup() {
         document.getElementById('instructions-phase').classList.add('hidden');
         document.getElementById('setup-phase').classList.remove('hidden');
     }
-
     function showNewTest() {
       document.getElementById('status-display').classList.add('hidden');
       document.getElementById('thank-you').classList.add('hidden');
       document.getElementById('download-group').classList.add('hidden');
       document.getElementById('new-test-phase').classList.remove('hidden');
     }
-
     function goToHome() {
       document.getElementById('status-display').classList.add('hidden');
       document.getElementById('thank-you').classList.add('hidden');
@@ -589,7 +602,6 @@
       webgazer.end();
       isWebGazerInitialized = false;
     }
-
     async function startEyeTracking() {
       testTakerName = document.getElementById('testerName').value.trim() || 'unknown';
       testTakerAge = document.getElementById('testerAge').value || 'unknown';
@@ -624,7 +636,6 @@
         updateStatus('Error: ' + error.message, 'status-warning');
       }
     }
-
     async function startNewTest() {
       const imageUrl = document.getElementById('newImageUrl').value;
       const imageFile = document.getElementById('newImageFile').files[0];
@@ -652,7 +663,6 @@
         updateStatus('Error: ' + error.message, 'status-warning');
       }
     }
-
     function loadBackground(url, file) {
       return new Promise((resolve, reject) => {
         if (currentImage) currentImage.remove();
@@ -696,7 +706,6 @@
         }
       });
     }
-
     function initializeWebGazer() {
       return new Promise((resolve, reject) => {
         webgazer
@@ -711,7 +720,6 @@
           .catch(reject);
       });
     }
-
     function startCalibration() {
       return new Promise((resolve) => {
         const overlay = document.createElement('div');
@@ -732,7 +740,6 @@
         }, 1000);
       });
     }
-
     function performCalibration(overlay, resolve) {
       const points = [
         ['10%', '10%'], ['50%', '10%'], ['90%', '10%'],
@@ -759,7 +766,6 @@
       }
       next();
     }
-
     function beginTracking() {
       trackingActive = true;
       startTime = Date.now();
@@ -780,7 +786,6 @@
         if (remaining <= 0) stopTracking();
       }, 1000);
     }
-
     function stopTracking() {
       trackingActive = false;
       clearInterval(timerInterval);
@@ -792,14 +797,12 @@
       document.getElementById('thank-you').classList.remove('hidden');
       updateStatus('Tracking successfully done', 'status-success');
     }
-
     function downloadResults() {
       generateExcelFile();
       generateHeatmap('simple');
       generateHeatmap('timing');
       generateHeatmap('density');
     }
-
     function recordGazeData(x, y, timestamp) {
       gazeData.push({
         timestamp,
@@ -813,7 +816,6 @@
         nationality: testTakerNationality
       });
     }
-
     function drawGazeDot(x, y) {
       const dot = document.createElement('div');
       dot.className = 'gaze-dot';
@@ -822,7 +824,6 @@
       document.body.appendChild(dot);
       setTimeout(() => dot.remove(), 200);
     }
-
     function generateExcelFile() {
       const data = gazeData.map((g, i) => ({
         Index: i + 1,
@@ -841,7 +842,6 @@
       XLSX.utils.book_append_sheet(wb, ws, 'Gaze Data');
       XLSX.writeFile(wb, `gaze_data_${testTakerName}.xlsx`);
     }
-
     function generateHeatmap(type) {
       const canvas = document.createElement('canvas');
       canvas.width = window.innerWidth;
@@ -933,7 +933,6 @@
         a.click();
       });
     }
-
     function updateStatus(msg, className) {
       const status = document.getElementById('status-message');
       status.textContent = msg;
